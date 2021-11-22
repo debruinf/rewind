@@ -1,17 +1,18 @@
 # Rewind
 
-## Rewinds your filesystem to before you messed up.
+## Rewinds your working directory to before you messed up.
 
-Rewind let's you remove all files in the current directory that where
-changed/added in the last X seconds.
+Rewind removes all files in the current directory that where
+changed/added in the last X seconds (60 default).
 
-Very helpful in case of a misplaced git clone, unzip, download or, the worst of
-all, yarn install (or any other installer).
+Very helpful in case of a misplaced git clone, unzip, download yarn install.
+
+Rewind will always ask to confirm the removal of files unless an explicit flag is set.
 
 
 ## Usage
 
-Base usage:
+Basic usage:
 
     $ rewind
     ...

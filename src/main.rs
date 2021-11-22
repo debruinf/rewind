@@ -11,6 +11,11 @@ struct Config {
     confirmation: bool
 }
 
+struct Ffile {
+    modified: Duration,
+    path: Path
+}
+
 fn set_config(matches: ArgMatches ) -> Config {
     // Get default values
     let mut config  = Config {
@@ -20,7 +25,7 @@ fn set_config(matches: ArgMatches ) -> Config {
 
     // Check if, and use when, time variable is set
     let secs = matches.value_of("seconds")
-        .unwrap_or("60")
+        .unwrap_or("60") // TODO already set, can we just unwrap?
         .parse()
         .unwrap();
     config.time = Duration::from_secs(secs);
@@ -33,10 +38,14 @@ fn set_config(matches: ArgMatches ) -> Config {
     return config
 }
 
+fn collect_files_paths() {
+    return 
+}
+
 fn main()  {
     let matches = App::new("rewind")
         .version("0.1.1")
-        .about("Rewinds your working directory to a point in time as far as newly added files go.")
+        .about("Rewinds your working directory to a certain point in time (as far as newly added files go).")
         .author("debruinf")
         .arg(Arg::with_name("seconds")
              .short("t")
@@ -50,9 +59,10 @@ fn main()  {
         .get_matches();
 
     let config = set_config(matches);
-    println!("{:?} seconds will be used and a confirmation will be asked {:?}", config.time, config.confirmation);
 
+    let to_be_deleted_files = collect_files_paths();
 
+    print_file_times()
     // let file_count = remove_stuff(Path::new("./"), time, force);
 
     // // if force == true update user. Otherwise, ask user to confirm for removal
@@ -80,6 +90,41 @@ fn main()  {
     // } else {
     //     println!("Nothing to rewind")
     // }
+}
+
+fn get_mod_time() -> Duration {
+    Duration::from_secs(60)
+}
+
+fn print_file_times() {
+    // Return a list of all files in the working directory filtered on modified_time
+    let aaa = fs::read_dir("./").iter();
+    println!("{:?}", &aaa)
+    // aaa.filter(|x| )
+    // for entry in fs::read_dir("./").unwrap() {
+    //     let ffile = Ffile {
+    //         path: entry.unwap(),
+    //         modified: get_mod_time()
+    //     };
+    //     aa.push(ffile)
+    // }
+    //     let dir = entry.unwrap();
+    //     match dir.metadata() {
+    //         Ok(m) =>
+    //             if !m.is_dir() {
+    //                 match m.modified() {
+    //                     Ok(mod_time) => {
+    //                         return mod_time.elapsed()
+    //                             // println!("{:?}", dir);
+    //                             // println!("{:?}", mod_time.elapsed().unwrap());
+    //                     }
+    //                     Err(err) => println!("{:?}", err),
+    //                 }
+    //             }
+    //         Err(err) => println!("{:?}", err),
+    //     }
+    // };
+
 }
 
 fn remove_stuff(path: &Path, time: Duration, force: bool) -> i64 {
