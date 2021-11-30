@@ -8,19 +8,19 @@ use std::io::{stdin,stdout,Write};
 
 struct Config {
     time: Duration,
-    confirmation: bool
+    ask_confirmation: bool
 }
 
-struct Ffile {
-    modified: Duration,
-    path: Path
-}
+// struct Ffile {
+//     modified: Duration,
+//     path: Path
+// }
 
 fn set_config(matches: ArgMatches ) -> Config {
     // Get default values
     let mut config  = Config {
         time: Duration::from_secs(60),
-        confirmation: true
+        ask_confirmation: true
     };
 
     // Check if, and use when, time variable is set
@@ -32,14 +32,44 @@ fn set_config(matches: ArgMatches ) -> Config {
 
     // Check if 'no confirmation' flag is set
     if matches.is_present("no confirmation") {
-        config.confirmation = false
+        config.ask_confirmation = false
     }
 
     return config
 }
 
-fn collect_files_paths() {
+                    // match m.modified() {
+                    //     Ok(mod_time) => {
+                    //         if mod_time.elapsed().unwrap() < time {
+                    //             iter += 1;
+                    //             if force {
+
+
+fn collect_files_paths(time: Duration) {
+    let mut file_list: Vec<fs::DirEntry> = Vec::new();
+
+    for item in fs::read_dir("./").unwrap() {
+        // if item.unwrap().is_file(){ // TODO consider doing this elsewhere
+            // let creation_time = item.unwrap().metadata().unwrap().created();
+            // if creation_time.elapsed().unwrap() < time {
+        file_list.push(item.unwrap())
+            // }
+        // }
+
+    }
+
+
     return 
+}
+
+fn get_confirmation() -> bool {
+        print!("Continue? (yes to continue): ");
+        let mut user_input = String::new();
+        let _ = stdout().flush();
+        stdin().read_line(&mut user_input).expect("Did not enter a correct string");
+        let user_input = user_input.trim_end();
+
+        user_input == "yes"
 }
 
 fn main()  {
@@ -53,16 +83,29 @@ fn main()  {
              .help("Rewind to how long ago in seconds (defaults to 60 seconds)")
              .takes_value(true))
         .arg(Arg::with_name("no confirmation")
-             .long("no-conf")
-             .help("Doesn't ask for confirmation")
-             .takes_value(false))
+             .long("ask-conf")
+             .help("Doesn't ask for confirmation if set to false")
+             .takes_value(true))
         .get_matches();
 
     let config = set_config(matches);
 
-    let to_be_deleted_files = collect_files_paths();
+    let to_be_deleted_files = collect_files_paths(config.time);
 
-    print_file_times()
+    // TODO report to user what will be deleted
+
+    // if ask confirmation == true ask for confirm
+    let go_ahead = if config.ask_confirmation {
+        get_confirmation()
+    } else {        
+        true
+    };
+    
+    if go_ahead {
+        // TODO delete to_be_deleted_files
+    }
+    println!("{:?}", go_ahead);
+
     // let file_count = remove_stuff(Path::new("./"), time, force);
 
     // // if force == true update user. Otherwise, ask user to confirm for removal
@@ -98,8 +141,19 @@ fn get_mod_time() -> Duration {
 
 fn print_file_times() {
     // Return a list of all files in the working directory filtered on modified_time
-    let aaa = fs::read_dir("./").iter();
-    println!("{:?}", &aaa)
+    let mut file_list: Vec<fs::DirEntry> = Vec::new();
+
+    for item in fs::read_dir("./").unwrap() {
+        file_list.push(item.unwrap())
+    }
+
+    println!("{:?}", file_list)
+
+
+
+    // let aaa = fs::read_dir("./").iter();
+
+
     // aaa.filter(|x| )
     // for entry in fs::read_dir("./").unwrap() {
     //     let ffile = Ffile {
